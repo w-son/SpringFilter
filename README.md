@@ -1,5 +1,5 @@
 # Spring Filter
-Spring Security를 활용해 Dispatcher Servlet 앞단의 Filter가 어떤 방식으로 구동이 되고 무엇이 필요한지 실험해보는 프로젝트이다
+Spring Security를 활용해 DispatcherServlet 앞단의 Filter가 어떤 방식으로 구동되고 무엇이 필요한지 실험해보는 프로젝트이다
 
 
 ## Login Filter
@@ -11,7 +11,7 @@ Username과 Password를 활용해 인증 로직을 적용한 필터의 구동 �
 ![Table](./src/main/resources/static/overview.png)
 
 
-#### [1] SecurityFilterChain  
+### [1] SecurityFilterChain  
 
 
 Spring Security가 구동되면 서블릿 앞단의 필터 체인이 생성된다.  
@@ -21,7 +21,7 @@ SecurityContextPersistenceFilter, LogoutFilter, BasicAuthenticationFilter 등등
 WebSecurityConfigurerAdapter를 상속받은 클래스(SecurityConfig)에 관련 Security 설정을 진행할 것이다.  
 
    
-#### [2] AccountLoginFilter  
+### [2] AccountLoginFilter  
 
 
 UsernamePasswordAuthenticationFilter를 대체할 필터이다.  
@@ -31,7 +31,7 @@ attemptAuthentication 메서드를 통해서 AuthenticationManager를 호출한�
 추가로, 인증 성공 시 사용할 Handler를 생성자를 통해 주입 받는다.    
 
 
-#### [3] AuthenticationManager
+### [3] AuthenticationManager
 
 
 어떻게 보면 인증 로직이 구현되는 주체라고도 볼 수 있다.  
@@ -47,7 +47,7 @@ AuthenticationProvider를 상속받는 클래스를 AuthenticationManager에 등
 > 둘째, Filter는 필요 시에 Manager에 등록된 Provider들을 스캔하며 필요한 authenticate 메서드를 사용한다.  
 
   
-#### [4] AccountProvider
+### [4] AccountProvider
 
 
 authenticate 메서드가 오버라이드된 클래스이다.  
@@ -56,7 +56,7 @@ AuthenticationProvider를 상속받는 구조이고, 인증 절차가 진행될 
 존재하지 않는 Username이거나 Password가 일치하지 않는 경우 Exception을 throw 하게 된다.  
 
   
-#### [5] AuthenticationSuccessHandler
+### [5] AuthenticationSuccessHandler
 
 
 AccountFilter의 onAuthenticationSuccess가 호출이 되면 실행될 클래스이다.  
@@ -69,7 +69,7 @@ AuthenticationSuccessHandler는 인터페이스 이름이고 프로젝트의 구
 인증 실패의 경우 AuthenticationException 객체가 던져져 필터의 unsuccessfulAuthentication이 실행된다.  
 
   
-#### [6] UsernamePasswordAuthenticationToken
+### [6] UsernamePasswordAuthenticationToken
 
 
 Filter와 Provider, Handler, 끼리 파라미터를 주고 받을 때,
@@ -79,7 +79,7 @@ Authentication 을 상속받은 객체를 파라미터로 넘겨야 하기 때�
 PreAuthToken의 경우 principal은 username이고 PostAuthToken의 경우 principal은 Account 객체로 넘긴다.  
 
   
-#### [7] HttpServletRequestWrapper, DTO   
+### [7] HttpServletRequestWrapper, DTO   
 
 
 Filter Chain에 처음 Request가 들어오고 상황에 맞는 Response를 리턴하는 과정이다.  
