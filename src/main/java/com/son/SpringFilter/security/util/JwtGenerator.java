@@ -9,6 +9,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
 public class JwtGenerator {
 
@@ -26,6 +28,7 @@ public class JwtGenerator {
                     .withClaim("USER_ID", account.getId())
                     .withClaim("USERNAME", account.getUsername())
                     .withClaim("USER_ROLE", account.getRole().getRole())
+                    .withExpiresAt(new Date())
                     .sign(algorithm);
 
         } catch (Exception e) {

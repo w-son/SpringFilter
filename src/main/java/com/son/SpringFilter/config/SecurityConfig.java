@@ -14,7 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -38,12 +38,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests().antMatchers("/h2-console**").permitAll();
 
-        http.addFilterBefore(userLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(userLoginFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
 
     protected UserLoginFilter userLoginFilter() throws Exception {
-        UserLoginFilter filter = new UserLoginFilter("/login", loginSuccessHandler);
+        UserLoginFilter filter = new UserLoginFilter("/hello", loginSuccessHandler);
         filter.setAuthenticationManager(authenticationManager());
 
         return filter;
