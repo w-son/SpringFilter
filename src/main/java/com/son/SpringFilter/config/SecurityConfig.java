@@ -2,7 +2,7 @@ package com.son.SpringFilter.config;
 
 import com.son.SpringFilter.security.provider.AccountProvider;
 import com.son.SpringFilter.security.handler.LoginSuccessHandler;
-import com.son.SpringFilter.security.filter.UserLoginFilter;
+import com.son.SpringFilter.security.filter.AccountLoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,12 +38,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests().antMatchers("/h2-console**").permitAll();
 
-        http.addFilterAt(userLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(accountLoginFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
 
-    protected UserLoginFilter userLoginFilter() throws Exception {
-        UserLoginFilter filter = new UserLoginFilter("/hello", loginSuccessHandler);
+    protected AccountLoginFilter accountLoginFilter() throws Exception {
+        AccountLoginFilter filter = new AccountLoginFilter("/hello", loginSuccessHandler);
         filter.setAuthenticationManager(authenticationManager());
 
         return filter;

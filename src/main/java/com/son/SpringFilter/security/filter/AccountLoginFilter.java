@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.DataInput;
 import java.io.IOException;
 
-public class UserLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class AccountLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private AuthenticationSuccessHandler handler;
 
-    public UserLoginFilter(String url, AuthenticationSuccessHandler handler) {
+    public AccountLoginFilter(String url, AuthenticationSuccessHandler handler) {
         super(url);
         this.handler = handler;
     }
