@@ -1,4 +1,4 @@
-package com.son.SpringFilter.security.util;
+package com.son.SpringFilter.security.token;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 

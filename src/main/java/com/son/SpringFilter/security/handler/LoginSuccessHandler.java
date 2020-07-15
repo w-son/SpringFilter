@@ -5,7 +5,7 @@ import com.son.SpringFilter.domain.Account;
 import com.son.SpringFilter.dto.AccountResponseDto;
 import com.son.SpringFilter.exception.InternalServerException;
 import com.son.SpringFilter.security.util.JwtGenerator;
-import com.son.SpringFilter.security.util.PostAuthToken;
+import com.son.SpringFilter.security.token.PostAuthToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

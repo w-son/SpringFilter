@@ -1,8 +1,7 @@
 package com.son.SpringFilter.security.filter;
 
-import com.son.SpringFilter.security.util.PreAuthJwtToken;
-import com.son.SpringFilter.security.util.PreAuthLoginToken;
-import com.son.SpringFilter.security.util.TokenExtracter;
+import com.son.SpringFilter.security.token.PreAuthJwtToken;
+import com.son.SpringFilter.security.util.JwtExtracter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -18,16 +17,16 @@ import java.io.IOException;
 
 public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
-    private TokenExtracter tokenExtracter;
+    private JwtExtracter extracter;
 
-    public JwtAuthFilter(RequestMatcher matcher, TokenExtracter tokenExtracter) {
+    public JwtAuthFilter(RequestMatcher matcher, JwtExtracter extracter) {
         super(matcher);
-        this.tokenExtracter = tokenExtracter;
+        this.extracter = extracter;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-        PreAuthJwtToken token = tokenExtracter.extract(request);
+        PreAuthJwtToken token = extracter.extract(request);
         return super.getAuthenticationManager().authenticate(token);
     }
 

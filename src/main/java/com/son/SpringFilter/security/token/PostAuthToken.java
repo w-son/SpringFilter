@@ -1,6 +1,7 @@
-package com.son.SpringFilter.security.util;
+package com.son.SpringFilter.security.token;
 
 import com.son.SpringFilter.domain.Account;
+import com.son.SpringFilter.security.util.AccountContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

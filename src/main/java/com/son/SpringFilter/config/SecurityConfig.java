@@ -6,14 +6,13 @@ import com.son.SpringFilter.security.handler.LoginSuccessHandler;
 import com.son.SpringFilter.security.filter.AccountLoginFilter;
 import com.son.SpringFilter.security.provider.JwtProvider;
 import com.son.SpringFilter.security.util.FilterMatcher;
-import com.son.SpringFilter.security.util.TokenExtracter;
+import com.son.SpringFilter.security.util.JwtExtracter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,7 +25,7 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -34,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final LoginSuccessHandler loginSuccessHandler;
 
     private final JwtProvider jwtProvider;
-    private final TokenExtracter tokenExtracter;
+    private final JwtExtracter extracter;
 
     @Bean
     public AuthenticationManager getAuthenticationManager() throws Exception {
@@ -78,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     protected JwtAuthFilter jwtAuthFilter() throws Exception {
         FilterMatcher matcher = new FilterMatcher(Arrays.asList("/hello"), "/api/v1/**");
-        JwtAuthFilter filter = new JwtAuthFilter(matcher, tokenExtracter);
+        JwtAuthFilter filter = new JwtAuthFilter(matcher, extracter);
         filter.setAuthenticationManager(authenticationManager());
 
         return filter;

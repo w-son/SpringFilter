@@ -2,7 +2,7 @@ package com.son.SpringFilter.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.son.SpringFilter.dto.AccountRequestDto;
-import com.son.SpringFilter.security.util.PreAuthLoginToken;
+import com.son.SpringFilter.security.token.PreAuthLoginToken;
 import com.son.SpringFilter.security.util.RequestWrapper;
 import lombok.SneakyThrows;
 import org.springframework.security.core.Authentication;

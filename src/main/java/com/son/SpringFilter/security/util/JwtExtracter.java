@@ -1,13 +1,14 @@
 package com.son.SpringFilter.security.util;
 
 import com.son.SpringFilter.exception.InvalidHeaderException;
+import com.son.SpringFilter.security.token.PreAuthJwtToken;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Component
-public class TokenExtracter {
+public class JwtExtracter {
 
     private static final String HEADER_TYPE = "Authorization";
     private static final String HEADER_PREFIX = "Bearer ";
