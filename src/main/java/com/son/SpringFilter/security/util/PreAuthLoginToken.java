@@ -5,9 +5,11 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-public class PreAuthToken extends UsernamePasswordAuthenticationToken {
+public class PreAuthLoginToken extends UsernamePasswordAuthenticationToken {
 
-    public PreAuthToken(String username, String password) {
+    // AccountLoginFilter를 사용하는 경우
+
+    public PreAuthLoginToken(String username, String password) {
         super(username, password);
     }
 

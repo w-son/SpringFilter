@@ -96,3 +96,7 @@ request를 읽어들이고 필터 내 메서드에서 참조할 수 있게끔 Ac
 ## To be continued..
 JWT가 마이크로 서비스를 구성하는데 있어서 기존의 JDBCTokenStore나 InMemoryTokenStore에 비해 가지는 장점  
 그리고 JWT를 사용할 때의 Filter, Provider, Handler 구동 원리에 대해 알아 볼 예정이다.   
+
+## Reference
+https://sungminhong.github.io/spring/security/
+

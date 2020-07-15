@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class JwtGenerator {
@@ -28,7 +29,7 @@ public class JwtGenerator {
                     .withClaim("USER_ID", account.getId())
                     .withClaim("USERNAME", account.getUsername())
                     .withClaim("USER_ROLE", account.getRole().getRole())
-                    .withExpiresAt(new Date())
+                    .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(10)))
                     .sign(algorithm);
 
         } catch (Exception e) {

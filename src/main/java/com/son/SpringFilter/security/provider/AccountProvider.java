@@ -5,7 +5,7 @@ import com.son.SpringFilter.domain.UserRole;
 import com.son.SpringFilter.exception.CredentialErrorException;
 import com.son.SpringFilter.exception.UserNotFoundException;
 import com.son.SpringFilter.security.util.PostAuthToken;
-import com.son.SpringFilter.security.util.PreAuthToken;
+import com.son.SpringFilter.security.util.PreAuthLoginToken;
 import com.son.SpringFilter.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -30,7 +30,7 @@ public class AccountProvider implements AuthenticationProvider {
     @Override
     @SneakyThrows
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        PreAuthToken token = (PreAuthToken) authentication;
+        PreAuthLoginToken token = (PreAuthLoginToken) authentication;
 
         /*
          존재하는 username인지, username에 해당하는 password가 정확한지 확인
@@ -50,7 +50,7 @@ public class AccountProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return PreAuthToken.class.isAssignableFrom(aClass);
+        return PreAuthLoginToken.class.isAssignableFrom(aClass);
     }
 
 }
