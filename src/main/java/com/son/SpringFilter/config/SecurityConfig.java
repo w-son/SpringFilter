@@ -68,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     protected AccountLoginFilter accountLoginFilter() throws Exception {
-        FilterMatcher matcher = new FilterMatcher(Arrays.asList("/api/v1/**"), "/hello");
+        FilterMatcher matcher = new FilterMatcher(Arrays.asList("/api/v1/**"), Arrays.asList("/hello"));
         AccountLoginFilter filter = new AccountLoginFilter(matcher, loginSuccessHandler);
         filter.setAuthenticationManager(authenticationManager());
 
@@ -76,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     protected JwtAuthFilter jwtAuthFilter() throws Exception {
-        FilterMatcher matcher = new FilterMatcher(Arrays.asList("/hello"), "/api/v1/**");
+        FilterMatcher matcher = new FilterMatcher(Arrays.asList("/hello"), Arrays.asList("/", "/api/v1/**"));
         JwtAuthFilter filter = new JwtAuthFilter(matcher, extracter);
         filter.setAuthenticationManager(authenticationManager());
 

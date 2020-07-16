@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 public class FilterMatcher implements RequestMatcher {
 
     private OrRequestMatcher noAuth;
-    private RequestMatcher withAuth;
+    private OrRequestMatcher withAuth;
 
-    public FilterMatcher(List<String> noAuth, String withAuth) {
+    public FilterMatcher(List<String> noAuth, List<String> withAuth) {
         this.noAuth = new OrRequestMatcher(noAuth.stream().map(AntPathRequestMatcher::new).collect(Collectors.toList()));
-        this.withAuth = new AntPathRequestMatcher(withAuth);
+        this.withAuth = new OrRequestMatcher(withAuth.stream().map(AntPathRequestMatcher::new).collect(Collectors.toList()));
     }
 
     @Override

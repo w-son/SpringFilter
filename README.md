@@ -1,5 +1,41 @@
 # Spring Filter
-Spring Security를 활용해 DispatcherServlet 앞단의 Filter가 어떤 방식으로 구동되고 무엇이 필요한지 실험해보는 프로젝트이다
+Spring Security를 활용해 Token 기반 인증/인가 시스템에 대한 이해도를 높이고       
+DispatcherServlet 앞단의 Filter가 어떤 방식으로 구동되고 무엇이 필요한지 실험해보는 프로젝트이다.  
+
+
+## Spring의 Authentication과 JSON Web Token
+
+#### Spring Oauth2를 통해 시도 해봤던 Token 기반 인증과 문제점
+
+```
+1. InMemory TokenStore  
+인증을 마친 클라이언트에게 발행한 토큰을 서버의 메모리에 저장하는 방식이다.
+다음과 같은 문제점에 대해 생각해볼 필요가 있다.
+* 서버가 다운될 시 토큰의 관리가 힘들다.
+* 사용자 수가 늘어나면 메모리 효율이 떨어진다.
+* 서버의 확장성에 유동적이지 못하다. 인증정보를 동기화하는 작업이 필수적이라고 볼 수 있다.
+
+2. JDBC TokenStore
+인증을 마친 클라이언트에게 발행한 토큰을 서버의 DB에 저장하는 방식이다.
+다음과 같은 문제점에 대해 생각해볼 필요가 있다.
+* 인증 이후의 요청에 대해 추가적으로 DB의 토큰을 조회하는 작업이 필요하기 때문에 성능면에서 좋지 못하다. 
+* 서버의 확장성에 유동적이지 못하다. 인증정보를 동기화하는 작업이 필수적이라고 볼 수 있다.
+```
+
+### JSON Web Token 의 등장
+Key-Value 형태의 Claim 기반 토큰이다. 포함되는 내용은 다음과 같다.
+1. 서명 알고리즘과 타입을 담고 있는 Claim
+2. 사용자 정보(principal)와 권한(role), 그리고 유효 기간 등의 정보를 담고 있는 Claim
+3. 2번의 내용을 암호화 후 생성한 HMAC 
+
+
+각각의 Claim은 개행 문자 '\n'처럼 헤더에 포함시키기 어려운 문자도 존재하기 때문에 BASE64 인코딩 방식으로 이를 하나의 문자열로 변환한다.    
+토큰 검증은 토큰을 발행했던 것과 동일한 방식으로 2번에 해당하는 Claim을 암호화 한 후 3번의 HMAC과 비교해 인증이 정상적으로 이루어졌음을 검증할 수 있다.    
+처음 로그인 과정을 통해 인증을 받은 클라이언트 한에서만 발급한 토큰이므로 공격자가 수정한 내용에 대해서는 충분히 대처를 할 수 있고  
+공격자가 발급한 토큰을 그대로 재사용하는 경우는 토큰의 유효 기간을 짧게 잡음으로서 보완할 예정이다. (사실 이 경우는 JWT만의 문제는 아닌 것 같다)  
+이로써 인증 토큰을 검증하는 과정을 필터단에서 HMAC을 검증하는 과정만으로 확인할 수 있기 때문에    
+서버의 확장성이나 메모리 혹은 DB의 접근에 대한 오버헤드를 줄일 수 있음을 알 수 있다.  
+> 자, 이제 JWT 기반 인증/인가를 위한 Security Filter를 어떻게 구현 하였는지 살펴볼 차례이다  
 
 
 ## Login Filter
@@ -8,7 +44,7 @@ Username과 Password를 활용해 인증 로직을 적용한 필터의 구동 �
 
 
 ### Overview
-![Table](./src/main/resources/static/overview.png)
+![Table](./src/main/resources/static/AccountLoginFilter.png)
 
 
 ### [1] SecurityFilterChain  
@@ -93,10 +129,54 @@ request를 읽어들이고 필터 내 메서드에서 참조할 수 있게끔 Ac
 인증 후 사용자 정보와 JWT를 담아 리턴하기 위해 AccountResponseDto 클래스를 정의하였다.  
 
 
-## To be continued..
-JWT가 마이크로 서비스를 구성하는데 있어서 기존의 JDBCTokenStore나 InMemoryTokenStore에 비해 가지는 장점  
-그리고 JWT를 사용할 때의 Filter, Provider, Handler 구동 원리에 대해 알아 볼 예정이다.   
+## JWT Filter
+인증이 필요한 리소스에 요청을 받았을 때, 요청에 헤더에 존재하는 접근 토큰을 검증하는 역할을 담당한다.
+
+
+### Overview
+![Table](./src/main/resources/static/JwtAuthFilter.png)
+
+
+### [1] JwtAuthFilter  
+
+
+접근 토큰을 필요로 하는 요청에 대해 토큰을 검증하는 필터이다.  
+기본적인 필터의 구동 방식은 AbstractAuthenticationProcessingFilter을 상속받는 AccountLoginFilter와 동일하다.  
+HttpServletRequest의 헤더 정보를 읽어들이고 헤더 이름이 "Authorization" 인 헤더를 불러들어온 후 prefix를 확인한다.  
+헤더의 형식이 잘못된 경우 Exception을 발생시키고,  
+정상적인 형식의 헤더인 경우 prefix 뒤의 토큰을 attemptAuthentication 내부의 authenticate메서드에 넘겨주게 된다.   
+
+   
+### [2] PreAuthLoginToken과 PreAuthJwtToken
+
+
+AccountLoginFilter와 연동 하는 과정에서 꽤나 애먹었던 부분이다.  
+Filter의 attemptAuthentication 부분에서 UsernamePasswordAuthenticationToken 을 상속받은 PreAuthToken을  
+authenticate 메서드의 Authentication 파라미터로 넘겨 줄 때 동일한 형식의 토큰을 넘겨주는 경우  
+RequestMatcher의 url 명세에 상관 없이 필터가 동작할 수도 있다는 것을 깨달았다.  
+이 때문에 기존의 PreAuthToken을 필터에 따라 PreAuthLoginToken과 PreAuthJwtToken으로 분리해 사용하게 되었다.  
+
+
+### [3] JwtProvider
+
+
+토큰을 검증하는 authenticate 메서드가 구현된 클래스이다.  
+"com.auth0"에서 제공하는 JWTVerifier를 통해 HMAC을 검증하고 기간이 만료된 토큰이 아니라면  
+토큰 내의 claim들을 모두 추출한 후 SecurityContext에 저장할 클래스인 AccountContext의 형태로 리턴하게 된다.  
+
+  
+### [4] SecurityContext
+
+
+JwtAuthFilter가 attemptAuthentication을 수행하고 AuthenticationException 없이 successfulAuthentication을 수행하게 된다면  
+SecurityContext에 관련 Authentication을 저장한 후 doFilter를 통해 인증 완료된 요청을 처리하게 된다.  
+이때 SecurityContext에 저장하게 되는 클래스인 AccountContext는 Spring Security의 User 클래스를 상속받는다.  
+이 클래스에 기존의 User에서 필요로 하는 principal, credentials, authorities에 추가로 그룹 정보나 id 값을 설정한 후 SecurityContext에 저장할 수 있다.  
+클라이언트의 그룹 정보나 id 값은 이후에 SecurityContext를 참조해야하는 상황에서 그룹에 따른 리소스 접근 권한이나 요청을 구분하는데 이용할 수 있다.  
+토큰 검증에 실패했을 경우에는 ThreadLocal의 인증 실패한 토큰 정보를 재참조하게 되는 상황을 방지하기 위해 clearContext로 해당 내용을 지운다.  
+
 
 ## Reference
-https://sungminhong.github.io/spring/security/
-
+https://sungminhong.github.io/spring/security/  
+https://sanghaklee.tistory.com/47  
+https://bcho.tistory.com/999
