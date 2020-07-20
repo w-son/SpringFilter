@@ -1,0 +1,28 @@
+# "mvn package" 으로 jar 파일 생성
+# application.properties 에서
+# ...url=jdbc:postgresql://{이 부분}:5432/postgres
+# 기존의 localhost가 아닌 docker-compose에서 정의한 이름인 db 이어야 함
+
+# docker-compose up --build 으로
+# spring 컨테이너와 postgres 컨테이너를 실행시킨다
+
+# 추가로 이미 사용중인 포트가 있는지 확인
+
+version: '3.7'
+services:
+  spring:
+    container_name: spring
+    build: ./
+    ports:
+    - 8080:8080
+    depends_on:
+      - db
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'pass'
+      POSTGRES_DB: 'postgres'
